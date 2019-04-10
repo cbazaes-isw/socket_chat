@@ -8,15 +8,17 @@ io.on('connection', (client) => {
 
     client.on('entrar-chat', (usuario, callback) => {
 
-        if (!usuario.nombre) {
-            return callback({ ok: false, message: 'El nombre es neceserio' });
+        if (!usuario.nombre || !usuario.sala) {
+            return callback({ ok: false, message: 'El nombre/sala es neceserio' });
         }
 
-        let personas = usuarios.agregar_persona(client.id, usuario.nombre);
+        client.join(usuario.sala);
 
-        client.broadcast.emit('lista-usuarios', usuarios.get_personas());
+        let personas = usuarios.agregar_persona(client.id, usuario.nombre, usuario.sala);
 
-        callback(personas);
+        client.broadcast.to(usuario.sala).emit('lista-usuarios', usuarios.get_personas_x_sala(usuario.sala));
+
+        callback(usuarios.get_personas_x_sala(usuario.sala));
 
     });
 
@@ -25,7 +27,7 @@ io.on('connection', (client) => {
         let usuario = usuarios.get_persona(client.id);
 
         let mensaje = crear_notificacion(usuario.nombre, data.mensaje);
-        client.broadcast.emit('notificacion', mensaje);
+        client.broadcast.to(persona.sala).emit('notificacion', mensaje);
 
     });
 
@@ -33,8 +35,8 @@ io.on('connection', (client) => {
 
         let usuario_quitado = usuarios.quitar_persona(client.id);
 
-        client.broadcast.emit('notificacion', crear_notificacion('Administrador', `${usuario_quitado.nombre} abandonó el chat.`));
-        client.broadcast.emit('lista-usuarios', usuarios.get_personas());
+        client.broadcast.to(usuario_quitado.sala).emit('notificacion', crear_notificacion('Administrador', `${usuario_quitado.nombre} abandonó el chat.`));
+        client.broadcast.to(usuario_quitado.sala).emit('lista-usuarios', usuarios.get_personas_x_sala(usuario_quitado.sala));
 
     });
 

@@ -5,11 +5,12 @@ class Usuarios
         this.personas = [];
     }
 
-    agregar_persona(id, nombre)
+    agregar_persona(id, nombre, sala)
     {
         let persona = {
             id, 
-            nombre
+            nombre,
+            sala
         };
 
         this.personas.push(persona);
@@ -32,7 +33,8 @@ class Usuarios
 
     get_personas_x_sala(sala)
     {
-        // TODO
+        let personas_en_sala = this.personas.filter(p => p.sala === sala);
+        return personas_en_sala;
     }
 
     quitar_persona(id)
