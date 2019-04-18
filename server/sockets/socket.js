@@ -22,12 +22,14 @@ io.on('connection', (client) => {
 
     });
 
-    client.on('notificacion', (data) => {
+    client.on('notificacion', (data, callback) => {
 
         let usuario = usuarios.get_persona(client.id);
-
         let mensaje = crear_notificacion(usuario.nombre, data.mensaje);
-        client.broadcast.to(persona.sala).emit('notificacion', mensaje);
+
+        client.broadcast.to(usuario.sala).emit('notificacion', mensaje);
+
+        callback(mensaje);
 
     });
 
