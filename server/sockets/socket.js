@@ -14,9 +14,10 @@ io.on('connection', (client) => {
 
         client.join(usuario.sala);
 
-        let personas = usuarios.agregar_persona(client.id, usuario.nombre, usuario.sala);
+        usuarios.agregar_persona(client.id, usuario.nombre, usuario.sala);
 
         client.broadcast.to(usuario.sala).emit('lista-usuarios', usuarios.get_personas_x_sala(usuario.sala));
+        client.broadcast.to(usuario.sala).emit('notificacion', crear_notificacion('Administrador', `${usuario.nombre} se unió al chat.`));
 
         callback(usuarios.get_personas_x_sala(usuario.sala));
 

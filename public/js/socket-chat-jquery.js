@@ -34,9 +34,12 @@ function renderizar_usuarios(personas)
 function renderizar_mensajes(mensaje, enviado)
 {
 
-    var today = new Date();
+    var today = new Date(mensaje.fecha);
     var current_time = today.getHours() + ':' + today.getMinutes();
     var html = '';
+
+    var adminClass = 'info';
+    if (mensaje.nombre === 'Administrador') adminClass = 'danger';
 
     if (enviado)
     {
@@ -52,10 +55,13 @@ function renderizar_mensajes(mensaje, enviado)
     else
     {
         html += '<li class="animated fadeIn">';
-        html += '    <div class="chat-img"><img src="assets/images/users/1.jpg" alt="user" /></div>';
+        
+        if (mensaje.nombre !== 'Administrador')
+            html += '    <div class="chat-img"><img src="assets/images/users/1.jpg" alt="user" /></div>';
+
         html += '    <div class="chat-content">';
         html += '        <h5>' + mensaje.nombre + '</h5>';
-        html += '        <div class="box bg-light-info">' + mensaje.mensaje + '</div>';
+        html += '        <div class="box bg-light-' + adminClass + '">' + mensaje.mensaje + '</div>';
         html += '    </div>';
         html += '    <div class="chat-time">' + current_time + '</div>';
         html += '</li>';
@@ -65,7 +71,22 @@ function renderizar_mensajes(mensaje, enviado)
 
 }
 
+function scrollBottom() {
 
+    // selectors
+    var newMessage = div_chatbox.children('li:last-child');
+
+    // heights
+    var clientHeight = div_chatbox.prop('clientHeight');
+    var scrollTop = div_chatbox.prop('scrollTop');
+    var scrollHeight = div_chatbox.prop('scrollHeight');
+    var newMessageHeight = newMessage.innerHeight();
+    var lastMessageHeight = newMessage.prev().innerHeight() || 0;
+
+    if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+        div_chatbox.scrollTop(scrollHeight);
+    }
+}
 
 // Listeners
 div_usuarios.on('click', 'a[data-id]', function() {
@@ -87,8 +108,9 @@ form_enviar.on('submit', function(e){
         mensaje: input_mensaje.val().trim()
     }, function(mensaje) {
 
-        renderizar_mensajes(mensaje, true);
         input_mensaje.val('').focus();
+        renderizar_mensajes(mensaje, true);
+        scrollBottom();
         
     });
     

@@ -41,6 +41,7 @@ socket.on('disconnect', function() {
 socket.on('notificacion', function(mensaje) {
 
     renderizar_mensajes(mensaje, false);
+    scrollBottom();
 
 });
 
